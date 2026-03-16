@@ -1,0 +1,596 @@
+<!-- register.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - SentimentAI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                        accent: '#ec4899',
+                        dark: '#0f172a',
+                        darker: '#020617',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        *::before, *::after { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; overflow-x: hidden; }
+        body {
+            background-color: #020617;
+            color: white;
+            font-family: 'Inter', sans-serif;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .input-field {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #ec4899;
+            box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+            outline: none;
+        }
+        .input-glow:focus {
+            box-shadow: 0 0 20px rgba(236, 72, 153, 0.3);
+        }
+        .social-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .social-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .floating-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.5;
+            animation: float 18s infinite ease-in-out;
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-30px, -50px) scale(1.1); }
+            66% { transform: translate(20px, 20px) scale(0.9); }
+        }
+        .grid-bg {
+            background-image: linear-gradient(rgba(236, 72, 153, 0.05) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(236, 72, 153, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        .loader {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        }
+
+        /* Unique register animations */
+        .slide-right {
+            opacity: 0;
+            transform: translateX(50px);
+        }
+        .slide-down {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        .scale-in {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        .rotate-in {
+            opacity: 0;
+            transform: rotate(-10deg) scale(0.9);
+        }
+
+        .step-indicator {
+            position: relative;
+        }
+        .step-indicator::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            width: 100%;
+            height: 2px;
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-50%);
+        }
+        .step-indicator:last-child::after {
+            display: none;
+        }
+        .step-active {
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            border-color: transparent;
+        }
+
+        .password-strength {
+            height: 4px;
+            border-radius: 2px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .check-icon {
+            stroke-dasharray: 20;
+            stroke-dashoffset: 20;
+            transition: stroke-dashoffset 0.4s ease;
+        }
+        .check-visible {
+            stroke-dashoffset: 0;
+        }
+
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(236, 72, 153, 0.2);
+        }
+
+        .gradient-border {
+            position: relative;
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(139, 92, 246, 0.1));
+        }
+        .gradient-border::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center relative overflow-hidden">
+
+    <!-- Animated Background -->
+    <div class="absolute inset-0 grid-bg"></div>
+    <div class="floating-orb w-[500px] h-[500px] bg-accent/20 top-[-15%] left-[-10%]" style="animation-delay: 0s;"></div>
+    <div class="floating-orb w-96 h-96 bg-secondary/20 bottom-[-10%] right-[-5%]" style="animation-delay: 6s;"></div>
+    <div class="floating-orb w-80 h-80 bg-primary/20 top-[50%] left-[30%]" style="animation-delay: 12s;"></div>
+
+    <div id="particles" class="absolute inset-0 pointer-events-none"></div>
+
+    <!-- Main Container -->
+    <div class="relative z-10 w-full max-w-6xl mx-4 my-8">
+        <div class="glass-card rounded-3xl overflow-hidden flex min-h-[750px] flex-row-reverse">
+
+            <!-- Right Side - Visual Content (Reversed for register) -->
+            <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-bl from-accent/10 to-secondary/10 relative flex-col justify-between p-12 overflow-hidden">
+                <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.03\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
+
+                <!-- Logo -->
+                <div class="slide-right text-right">
+                    <a href="index.html" class="inline-flex items-center gap-3 group flex-row-reverse">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-bl from-accent to-secondary flex items-center justify-center text-white font-bold text-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                            S
+                        </div>
+                        <span class="font-display font-bold text-2xl">SentimentAI</span>
+                    </a>
+                </div>
+
+                <!-- Content -->
+                <div class="relative z-10 my-auto text-right">
+                    <div class="inline-block">
+                        <h2 class="font-display text-5xl font-bold mb-6 slide-down leading-tight">
+                            Start Your<br>
+                            <span class="gradient-text">Journey</span>
+                        </h2>
+                    </div>
+                    <p class="text-gray-400 text-lg mb-12 slide-right leading-relaxed max-w-md ml-auto">
+                        Join thousands of analysts and marketers who trust SentimentAI to decode audience emotions and drive engagement.
+                    </p>
+
+                    <!-- Feature Cards -->
+                    <div class="space-y-4">
+                        <div class="feature-card gradient-border flex items-center gap-4 p-4 rounded-xl slide-right bg-white/5 cursor-pointer">
+                            <div class="w-12 h-12 rounded-lg bg-accent/20 flex items-center justify-center text-accent flex-shrink-0">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="text-left">
+                                <h4 class="font-semibold text-white">14-Day Free Trial</h4>
+                                <p class="text-sm text-gray-500">Full access to all features</p>
+                            </div>
+                        </div>
+
+                        <div class="feature-card gradient-border flex items-center gap-4 p-4 rounded-xl slide-right bg-white/5 cursor-pointer">
+                            <div class="w-12 h-12 rounded-lg bg-secondary/20 flex items-center justify-center text-secondary flex-shrink-0">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                </svg>
+                            </div>
+                            <div class="text-left">
+                                <h4 class="font-semibold text-white">No Credit Card</h4>
+                                <p class="text-sm text-gray-500">Start without commitment</p>
+                            </div>
+                        </div>
+
+                        <div class="feature-card gradient-border flex items-center gap-4 p-4 rounded-xl slide-right bg-white/5 cursor-pointer">
+                            <div class="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center text-primary flex-shrink-0">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="text-left">
+                                <h4 class="font-semibold text-white">24/7 Support</h4>
+                                <p class="text-sm text-gray-500">We're here to help you</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial -->
+                <div class="slide-right bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+                    <div class="flex items-center gap-1 mb-3">
+                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                    </div>
+                    <p class="text-sm text-gray-300 mb-4 italic">"SentimentAI transformed how we understand our Facebook audience. The insights are invaluable."</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-secondary flex items-center justify-center text-white font-bold text-sm">
+                            JD
+                        </div>
+                        <div>
+                            <div class="font-semibold text-sm text-white">Jane Doe</div>
+                            <div class="text-xs text-gray-500">Marketing Director, TechCorp</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Left Side - Register Form -->
+            <div class="w-full lg:w-1/2 p-8 md:p-12 lg:p-16 flex flex-col justify-center relative bg-dark/20">
+
+                <div class="max-w-md mx-auto w-full scale-in" id="register-container">
+
+                    <!-- Step Indicator -->
+                    <div class="flex items-center justify-center gap-4 mb-8">
+                        <div class="step-indicator flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full border-2 border-accent bg-accent/20 flex items-center justify-center text-sm font-bold text-accent">1</div>
+                            <span class="text-sm text-gray-400 hidden sm:inline">Account</span>
+                        </div>
+                        <div class="step-indicator flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full border-2 border-gray-600 flex items-center justify-center text-sm font-bold text-gray-600">2</div>
+                            <span class="text-sm text-gray-600 hidden sm:inline">Verify</span>
+                        </div>
+                        <div class="step-indicator flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full border-2 border-gray-600 flex items-center justify-center text-sm font-bold text-gray-600">3</div>
+                            <span class="text-sm text-gray-600 hidden sm:inline">Start</span>
+                        </div>
+                    </div>
+
+                    <div class="text-center mb-8">
+                        <h1 class="font-display text-3xl font-bold mb-3">Create your account</h1>
+                        <p class="text-gray-400">Start your 14-day free trial today</p>
+                    </div>
+
+                    <form onsubmit="handleRegister(event)" class="space-y-5" id="registerForm">
+
+                        <!-- Name Row -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="group">
+                                <label class="block text-sm font-medium text-gray-400 mb-2 ml-1">First Name</label>
+                                <input type="text" id="reg-firstname" name="first_name" required
+                                    class="input-field w-full px-4 py-3.5 rounded-xl text-white placeholder-gray-600 text-sm input-glow"
+                                    placeholder="John">
+                            </div>
+                            <div class="group">
+                                <label class="block text-sm font-medium text-gray-400 mb-2 ml-1">Last Name</label>
+                                <input type="text" id="reg-lastname" name="last_name" required
+                                    class="input-field w-full px-4 py-3.5 rounded-xl text-white placeholder-gray-600 text-sm input-glow"
+                                    placeholder="Doe">
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="group">
+                            <label class="block text-sm font-medium text-gray-400 mb-2 ml-1">Email Address</label>
+                            <input type="email" id="reg-email" name="email" required
+                                class="input-field w-full px-4 py-3.5 rounded-xl text-white placeholder-gray-600 text-sm input-glow"
+                                placeholder="name@company.com">
+                        </div>
+
+                        <!-- Password -->
+                        <div class="group">
+                            <label class="block text-sm font-medium text-gray-400 mb-2 ml-1">Password</label>
+                            <div class="relative">
+                                <input type="password" id="reg-password" name="password" required
+                                    class="input-field w-full px-4 py-3.5 rounded-xl text-white placeholder-gray-600 text-sm pr-12 input-glow"
+                                    placeholder="••••••••"
+                                    oninput="checkPasswordStrength(this.value)">
+                                <button type="button"
+                                    onclick="togglePassword('reg-password', this)"
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors">
+                                    👁
+                                </button>
+                            </div>
+
+                            <!-- Strength Meter -->
+                            <div class="mt-3 space-y-2">
+                                <div class="flex gap-1">
+                                    <div id="strength-1" class="password-strength flex-1 bg-gray-700 h-1 rounded"></div>
+                                    <div id="strength-2" class="password-strength flex-1 bg-gray-700 h-1 rounded"></div>
+                                    <div id="strength-3" class="password-strength flex-1 bg-gray-700 h-1 rounded"></div>
+                                    <div id="strength-4" class="password-strength flex-1 bg-gray-700 h-1 rounded"></div>
+                                </div>
+                                <div class="flex justify-between text-xs">
+                                    <span id="strength-text" class="text-gray-500">Password strength</span>
+                                    <span id="strength-percent" class="text-gray-600">0%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="group">
+                            <label class="block text-sm font-medium text-gray-400 mb-2 ml-1">Confirm Password</label>
+                            <input type="password" id="reg-confirm" required
+                                class="input-field w-full px-4 py-3.5 rounded-xl text-white placeholder-gray-600 text-sm input-glow"
+                                placeholder="••••••••">
+                        </div>
+
+                        <!-- Terms -->
+                        <div class="flex items-start gap-3">
+                            <input type="checkbox" id="terms" required
+                                class="mt-1 w-4 h-4 rounded border-gray-600 bg-white/5 text-accent">
+                            <label for="terms" class="text-sm text-gray-400">
+                                I agree to the <span class="text-accent">Terms of Service</span> and
+                                <span class="text-accent">Privacy Policy</span>.
+                            </label>
+                        </div>
+
+                        <!-- Submit -->
+                        <button type="submit"
+                            class="w-full py-4 rounded-xl bg-gradient-to-r from-accent to-secondary text-white font-semibold hover:shadow-lg transition-all">
+                            Create Account →
+                        </button>
+
+                    </form>
+
+
+                    <div class="divider relative my-8 text-center">
+                        <span class="bg-[#0f172a] px-4 text-sm text-gray-500">Or sign up with</span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3">
+                        <button class="social-btn py-3.5 rounded-xl flex items-center justify-center text-white hover:text-red-400 transition-all hover:scale-105">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                            </svg>
+                        </button>
+                        <button class="social-btn py-3.5 rounded-xl flex items-center justify-center text-white hover:text-blue-400 transition-all hover:scale-105">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                        </button>
+                        <button class="social-btn py-3.5 rounded-xl flex items-center justify-center text-white hover:text-gray-300 transition-all hover:scale-105">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <p class="mt-8 text-center text-sm text-gray-500">
+                        Already have an account?
+                        <a href="/login" class="text-accent hover:text-accent/80 font-semibold hover:underline transition-all">Sign in</a>
+                    </p>
+                </div>
+
+                <!-- Back Link -->
+                <div class="absolute bottom-8 right-8">
+                    <a href="/" class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-white transition-colors group">
+                        Back to home
+                        <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-8 left-8 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <div class="glass-card px-6 py-4 rounded-xl flex items-center gap-3 border-l-4 border-accent min-w-[300px]">
+            <div id="toast-icon"></div>
+            <div>
+                <h4 id="toast-title" class="font-semibold text-sm text-white"></h4>
+                <p id="toast-message" class="text-xs text-gray-400 mt-1"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ---------------- PARTICLES ---------------- */
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 20; i++) {
+                const p = document.createElement('div');
+                p.className = 'absolute w-1 h-1 bg-white/20 rounded-full';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.top = Math.random() * 100 + '%';
+                container.appendChild(p);
+
+                gsap.to(p, {
+                    y: -100 + Math.random() * 200,
+                    x: -50 + Math.random() * 100,
+                    opacity: 0,
+                    duration: Math.random() * 10 + 10,
+                    repeat: -1,
+                    delay: Math.random() * 5,
+                    ease: "none"
+                });
+            }
+        }
+        createParticles();
+
+        /* ---------------- ENTRANCE ANIMATION ---------------- */
+        gsap.timeline({ defaults: { ease: "power3.out" } })
+            .to(".slide-right", { opacity: 1, x: 0, duration: 0.8, stagger: 0.1 })
+            .to(".slide-down", { opacity: 1, y: 0, duration: 0.6 }, "-=0.6")
+            .to(".scale-in", { opacity: 1, scale: 1, duration: 0.6 }, "-=0.4");
+
+        /* ---------------- PASSWORD TOGGLE ---------------- */
+        function togglePassword(id, btn) {
+            const input = document.getElementById(id);
+            input.type = input.type === "password" ? "text" : "password";
+        }
+
+        /* ---------------- PASSWORD STRENGTH ---------------- */
+        function checkPasswordStrength(password) {
+        const bars = [
+            document.getElementById('strength-1'),
+            document.getElementById('strength-2'),
+            document.getElementById('strength-3'),
+            document.getElementById('strength-4')
+        ];
+        const text = document.getElementById('strength-text');
+        const percent = document.getElementById('strength-percent');
+
+        let score = 0;
+
+        if (password.length > 0) score += 25;                 // typed something
+        if (/[A-Z]/.test(password)) score += 25;              // uppercase
+        if (/[0-9]/.test(password)) score += 25;              // number
+        if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) score += 25; // symbol
+
+        bars.forEach((bar, i) => {
+            bar.className = `password-strength flex-1 ${
+                score / 25 > i ? 'bg-green-500' : 'bg-gray-700'
+            }`;
+        });
+
+        let label = "Weak";
+        if (score >= 75) label = "Strong";
+        else if (score >= 50) label = "Medium";
+
+        text.textContent = `Password strength: ${label}`;
+        percent.textContent = score + '%';
+        }
+
+        /* ---------------- TOAST ---------------- */
+        function showToast(title, message, type = 'success') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').textContent = title;
+            document.getElementById('toast-message').textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+
+        /* ---------------- REGISTER (FINAL & CLEAN) ---------------- */
+        function handleRegister(e) {
+            e.preventDefault();
+
+            const first_name = document.getElementById('reg-firstname').value.trim();
+            const last_name = document.getElementById('reg-lastname').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value;
+            const confirm = document.getElementById('reg-confirm').value;
+            const terms = document.getElementById('terms').checked;
+
+            if (!terms) {
+                showToast('Error', 'Please accept Terms & Privacy Policy', 'error');
+                return;
+            }
+
+            if (password !== confirm) {
+                showToast('Error', 'Passwords do not match', 'error');
+                return;
+            }
+
+            fetch("/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    first_name,
+                    last_name,
+                    email,
+                    password
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Success', 'Account created successfully');
+                    setTimeout(() => {
+                        window.location.href = data.redirect;
+                    }, 1200);
+                } else {
+                    showToast('Error', data.message, 'error');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showToast('Error', 'Server error', 'error');
+            });
+        }
+
+
+    </script>
+
+</body>
+</html>

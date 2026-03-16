@@ -1,0 +1,340 @@
+<!-- history.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History - SentimentAI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                        accent: '#ec4899',
+                        dark: '#0f172a',
+                        darker: '#020617',
+                        sidebar: '#0f172a',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        *::before, *::after { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; }
+        body {
+            background-color: #020617;
+            color: white;
+            font-family: 'Inter', sans-serif;
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .sidebar-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .sidebar-link:hover, .sidebar-link.active {
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.1) 0%, transparent 100%);
+            border-left: 3px solid #6366f1;
+        }
+        .sidebar-link.active {
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.15) 0%, transparent 100%);
+        }
+        .timeline-line {
+            background: linear-gradient(to bottom, #6366f1, #8b5cf6, #ec4899);
+        }
+        .timeline-dot {
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+        }
+        .activity-card {
+            transition: all 0.3s ease;
+        }
+        .activity-card:hover {
+            transform: translateX(5px);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .filter-chip {
+            transition: all 0.2s ease;
+        }
+        .filter-chip.active {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-color: transparent;
+        }
+        .dropdown-menu {
+            transform-origin: top right;
+            transition: all 0.2s ease;
+        }
+        .dropdown-menu.hidden {
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+        }
+        .dropdown-menu:not(.hidden) {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+        .search-input:focus {
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+        }
+        .stat-pill {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(1.3); opacity: 0; }
+        }
+        .live-indicator::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+    </style>
+</head>
+<body class="bg-darker min-h-screen flex overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-64 bg-sidebar border-r border-white/10 flex flex-col h-screen transition-all duration-300 fixed lg:relative z-50 -translate-x-full lg:translate-x-0">
+        <div class="p-6 border-b border-white/10">
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-xl shadow-lg group-hover:scale-110 transition-transform">S</div>
+                <span class="font-display font-bold text-xl">SentimentAI</span>
+            </a>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2">
+            <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4 px-4">Main</div>
+
+            <a href="/user_dashboard" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                <span class="font-medium">Dashboard</span>
+            </a>
+
+            <a href="/comment_analysis" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                <span class="font-medium">Comment Analysis</span>
+                <span class="ml-auto bg-accent/20 text-accent text-xs px-2 py-0.5 rounded-full">New</span>
+            </a>
+
+            <a href="/history" class="sidebar-link active flex items-center gap-3 px-4 py-3 rounded-lg text-white">
+                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span class="font-medium">History</span>
+            </a>
+
+            <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-8 mb-4 px-4">Settings</div>
+
+            <a href="/settings" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <span class="font-medium">Edit Info</span>
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-white/10">
+            <div class="flex items-center gap-3 p-3 rounded-xl bg-white/5 cursor-pointer hover:bg-white/10 transition-colors" onclick="toggleProfileMenu()">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-white font-bold">{{ user_initials }}</div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-white truncate">{{ user_display_name }}</p>
+                    <p class="text-xs text-gray-500 truncate">{{ user_email }}</p>
+                </div>
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+            <div id="profile-menu" class="dropdown-menu hidden absolute bottom-20 left-4 right-4 bg-sidebar border border-white/10 rounded-xl shadow-2xl overflow-hidden">
+
+                <a href="/logout" class="block px-4 py-3 text-sm text-red-400 hover:text-red-300 hover:bg-white/5 transition-colors">Sign out</a>
+            </div>
+        </div>
+    </aside>
+
+    <button onclick="toggleSidebar()" class="lg:hidden fixed top-4 left-4 z-50 p-2 bg-sidebar border border-white/10 rounded-lg text-white">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+    </button>
+
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden backdrop-blur-sm"></div>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto h-screen">
+        <header class="sticky top-0 z-30 bg-darker/80 backdrop-blur-md border-b border-white/10 px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl font-display font-bold text-white">History</h1>
+                    <p class="text-sm text-gray-400">Your recent comment analyses</p>
+                </div>
+                <div class="relative w-full max-w-xs">
+                    <input type="text" id="history-search" placeholder="Search..."
+                        class="search-input w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-gray-500 outline-none focus:border-primary transition-all">
+                    <svg class="w-4 h-4 text-gray-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-4 sm:p-6 lg:p-8">
+            <div class="glass-card rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold text-white">Recent History</h2>
+                    <span class="text-xs text-gray-500" id="history-count">0</span>
+                </div>
+
+                <div id="history-loading" class="text-sm text-gray-400">Loading...</div>
+                <div id="history-empty" class="text-sm text-gray-400 hidden">No history found.</div>
+
+                <div class="mt-4 overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="text-gray-400">
+                            <tr class="border-b border-white/10">
+                                <th class="text-left font-medium py-3 pr-4 whitespace-nowrap">Time</th>
+                                <th class="text-left font-medium py-3 pr-4 whitespace-nowrap">Result</th>
+                                <th class="text-left font-medium py-3">Comment</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-body" class="text-gray-200">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        function toggleProfileMenu() {
+            const menu = document.getElementById('profile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        document.addEventListener('click', function(e) {
+            const profileMenu = document.getElementById('profile-menu');
+            const profileTrigger = e.target.closest('[onclick="toggleProfileMenu()"]');
+            if (profileMenu && !profileTrigger && !profileMenu.contains(e.target)) {
+                profileMenu.classList.add('hidden');
+            }
+        });
+
+        function _escapeHtml(text) {
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        let _historyItems = [];
+
+        function renderHistory(items) {
+            const tbody = document.getElementById('history-body');
+            const empty = document.getElementById('history-empty');
+            const count = document.getElementById('history-count');
+
+            if (!tbody || !empty || !count) return;
+            tbody.innerHTML = '';
+            count.textContent = String(items.length);
+
+            if (!items.length) {
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+
+            items.forEach((it) => {
+                const pred = (it.prediction || '').toUpperCase();
+                const badgeClass = pred === 'HATE' ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400';
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-white/5';
+                tr.innerHTML = `
+                    <td class="py-3 pr-4 whitespace-nowrap text-gray-400">${_escapeHtml(it.created_at || '')}</td>
+                    <td class="py-3 pr-4 whitespace-nowrap">
+                        <span class="px-2 py-1 rounded-full text-xs font-medium ${badgeClass}">${_escapeHtml(pred || '—')}</span>
+                    </td>
+                    <td class="py-3">
+                        <span class="text-gray-200">${_escapeHtml(it.comment_text || '')}</span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function applySearch() {
+            const q = (document.getElementById('history-search')?.value || '').trim().toLowerCase();
+            if (!q) {
+                renderHistory(_historyItems);
+                return;
+            }
+            const filtered = _historyItems.filter((it) => {
+                return (it.comment_text || '').toLowerCase().includes(q) || (it.prediction || '').toLowerCase().includes(q);
+            });
+            renderHistory(filtered);
+        }
+
+        async function loadHistory() {
+            const loading = document.getElementById('history-loading');
+            const empty = document.getElementById('history-empty');
+            try {
+                if (loading) loading.classList.remove('hidden');
+                if (empty) empty.classList.add('hidden');
+
+                const res = await fetch('/api/history?limit=100', { headers: { 'Accept': 'application/json' } });
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    throw new Error(data.message || 'Failed to load history');
+                }
+                _historyItems = data.items || [];
+                applySearch();
+            } catch (e) {
+                console.error('History load error', e);
+                _historyItems = [];
+                renderHistory([]);
+            } finally {
+                if (loading) loading.classList.add('hidden');
+            }
+        }
+
+        const searchInput = document.getElementById('history-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', applySearch);
+        }
+
+        loadHistory();
+
+        gsap.from('.glass-card', {
+            y: 20,
+            opacity: 0,
+            duration: 0.6,
+            stagger: 0.1,
+            ease: 'power2.out'
+        });
+    </script>
+</body>
+</html>
