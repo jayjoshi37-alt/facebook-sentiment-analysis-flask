@@ -87,7 +87,7 @@
 
         .chart-bar {
             transform-origin: bottom;
-            transform: scaleY(0);
+            height: auto;
         }
 
         .particle {
@@ -179,8 +179,7 @@
             <div class="hidden md:flex items-center gap-8">
                 <a href="/about" class="text-sm text-gray-400 hover:text-white transition-colors">About</a>
                 <a href="/contact" class="text-sm text-gray-400 hover:text-white transition-colors">Contact</a>
-                <a href="#analytics" class="text-sm text-gray-400 hover:text-white transition-colors">Analytics</a>
-                <a href="#pricing" class="text-sm text-gray-400 hover:text-white transition-colors">Pricing</a>
+                <a href="/login" class="text-sm text-gray-400 hover:text-white transition-colors">Login</a>
             </div>
         </div>
     </nav>
@@ -250,7 +249,7 @@
     </section>
 
 
-    <!-- ========== Live Demo Section ===========
+
 
     <section id="demo" class="relative py-32 bg-darker">
         <div class="max-w-7xl mx-auto px-6 lg:px-12">
@@ -293,7 +292,7 @@
                         <div class="flex items-center gap-4 p-4 rounded-xl glass-card transform translate-x-[-50px] opacity-0 demo-feature">
                             <div class="w-12 h-12 rounded-lg bg-accent/20 flex items-center justify-center text-accent">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2m0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                                 </svg>
                             </div>
                             <div>
@@ -314,12 +313,12 @@
                                 <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
                                 <div class="w-3 h-3 rounded-full bg-green-500"></div>
                             </div>
-                            <span class="text-xs text-gray-500 uppercase tracking-wider">Live Analysis</span>
+                            <span class="text-xs text-gray-400 uppercase tracking-wider">Preview Mode</span>
                         </div>
 
 
                         <div class="mb-6">
-                            <textarea id="comment-input" class="w-full bg-dark/50 border border-white/10 rounded-xl p-4 text-white placeholder-gray-600 focus:outline-none focus:border-primary transition-colors resize-none h-32" placeholder="Paste a Facebook comment here to analyze..."></textarea>
+                            <textarea id="comment-input" class="w-full bg-dark/50 border border-white/10 rounded-xl p-4 text-white placeholder-gray-600 focus:outline-none focus:border-primary transition-colors resize-none h-32" placeholder="This is a demo sentiment analysis preview. Results may not be accurate and can make mistakes."></textarea>
                             <button onclick="analyzeComment()" class="mt-4 w-full py-3 rounded-lg bg-primary hover:bg-primary/80 text-white font-medium transition-colors flex items-center justify-center gap-2">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
@@ -364,7 +363,7 @@
         </div>
     </section>
 
-    ============ End of Live Demo Section -->
+
 
     <!-- Features Grid -->
     <section id="features" class="relative py-32 bg-dark overflow-hidden">
@@ -450,14 +449,12 @@
         </div>
     </section>
 
-    <!-- Analytics Visualization -->
     <section id="analytics" class="relative py-32 bg-darker overflow-hidden">
         <div class="max-w-7xl mx-auto px-6 lg:px-12">
             <div class="grid lg:grid-cols-2 gap-16 items-center">
                 <div class="order-2 lg:order-1 relative">
                     <div class="absolute -inset-4 bg-gradient-to-r from-accent/20 to-primary/20 rounded-3xl blur-2xl opacity-30"></div>
 
-                    <!-- Animated Chart -->
                     <div class="relative glass-card rounded-2xl p-8 border border-white/10">
                         <div class="flex items-center justify-between mb-8">
                             <h4 class="font-display font-bold text-lg">Sentiment Distribution</h4>
@@ -469,32 +466,32 @@
                         </div>
 
                         <div class="flex items-end justify-between h-64 gap-4" id="chart-container">
-                            <div class="flex-1 flex flex-col justify-end gap-2">
-                                <div class="chart-bar bg-gradient-to-t from-green-600 to-green-400 rounded-t-lg w-full" data-height="75%"></div>
+                            <div class="flex-1 flex flex-col justify-end gap-2 h-full">
+                                <div class="chart-bar bg-gradient-to-t from-green-600 to-green-400 rounded-t-lg w-full" style="height: 75%;"></div>
                                 <span class="text-xs text-gray-500 text-center">Mon</span>
                             </div>
-                            <div class="flex-1 flex flex-col justify-end gap-2">
-                                <div class="chart-bar bg-gradient-to-t from-gray-600 to-gray-400 rounded-t-lg w-full" data-height="45%"></div>
+                            <div class="flex-1 flex flex-col justify-end gap-2 h-full">
+                                <div class="chart-bar bg-gradient-to-t from-gray-600 to-gray-400 rounded-t-lg w-full" style="height: 45%;"></div>
                                 <span class="text-xs text-gray-500 text-center">Tue</span>
                             </div>
-                            <div class="flex-1 flex flex-col justify-end gap-2">
-                                <div class="chart-bar bg-gradient-to-t from-red-600 to-red-400 rounded-t-lg w-full" data-height="60%"></div>
+                            <div class="flex-1 flex flex-col justify-end gap-2 h-full">
+                                <div class="chart-bar bg-gradient-to-t from-red-600 to-red-400 rounded-t-lg w-full" style="height: 60%;"></div>
                                 <span class="text-xs text-gray-500 text-center">Wed</span>
                             </div>
-                            <div class="flex-1 flex flex-col justify-end gap-2">
-                                <div class="chart-bar bg-gradient-to-t from-green-600 to-green-400 rounded-t-lg w-full" data-height="85%"></div>
+                            <div class="flex-1 flex flex-col justify-end gap-2 h-full">
+                                <div class="chart-bar bg-gradient-to-t from-green-600 to-green-400 rounded-t-lg w-full" style="height: 85%;"></div>
                                 <span class="text-xs text-gray-500 text-center">Thu</span>
                             </div>
-                            <div class="flex-1 flex flex-col justify-end gap-2">
-                                <div class="chart-bar bg-gradient-to-t from-gray-600 to-gray-400 rounded-t-lg w-full" data-height="55%"></div>
+                            <div class="flex-1 flex flex-col justify-end gap-2 h-full">
+                                <div class="chart-bar bg-gradient-to-t from-gray-600 to-gray-400 rounded-t-lg w-full" style="height: 55%;"></div>
                                 <span class="text-xs text-gray-500 text-center">Fri</span>
                             </div>
-                            <div class="flex-1 flex flex-col justify-end gap-2">
-                                <div class="chart-bar bg-gradient-to-t from-green-600 to-green-400 rounded-t-lg w-full" data-height="90%"></div>
+                            <div class="flex-1 flex flex-col justify-end gap-2 h-full">
+                                <div class="chart-bar bg-gradient-to-t from-green-600 to-green-400 rounded-t-lg w-full" style="height: 90%;"></div>
                                 <span class="text-xs text-gray-500 text-center">Sat</span>
                             </div>
-                            <div class="flex-1 flex flex-col justify-end gap-2">
-                                <div class="chart-bar bg-gradient-to-t from-red-600 to-red-400 rounded-t-lg w-full" data-height="40%"></div>
+                            <div class="flex-1 flex flex-col justify-end gap-2 h-full">
+                                <div class="chart-bar bg-gradient-to-t from-red-600 to-red-400 rounded-t-lg w-full" style="height: 40%;"></div>
                                 <span class="text-xs text-gray-500 text-center">Sun</span>
                             </div>
                         </div>
@@ -510,6 +507,42 @@
                         Transform raw sentiment data into beautiful, actionable visualizations.
                         Track trends, identify patterns, and make data-driven decisions with our comprehensive analytics suite.
                     </p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+                        <div class="glass-card rounded-2xl p-5 border border-white/10">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm text-gray-400">Avg Positive</span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                            </div>
+                            <div class="font-display text-2xl font-bold text-white">68%</div>
+                            <div class="text-xs text-gray-500 mt-1">Last 7 days snapshot</div>
+                        </div>
+                        <div class="glass-card rounded-2xl p-5 border border-white/10">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm text-gray-400">Top Topic</span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
+                            </div>
+                            <div class="font-display text-2xl font-bold text-white">Product</div>
+                            <div class="text-xs text-gray-500 mt-1">Most discussed cluster</div>
+                        </div>
+                        <div class="glass-card rounded-2xl p-5 border border-white/10">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm text-gray-400">Risk Alerts</span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                            </div>
+                            <div class="font-display text-2xl font-bold text-white">Low</div>
+                            <div class="text-xs text-gray-500 mt-1">No major spikes detected</div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-4 mb-10">
+                        <a href="/register" class="px-7 py-3.5 rounded-xl bg-gradient-to-r from-accent to-secondary text-white font-semibold hover:shadow-lg hover:shadow-accent/30 transition-all text-center">
+                            Explore Dashboard
+                        </a>
+                        <a href="#demo" class="px-7 py-3.5 rounded-xl glass-card text-white font-semibold hover:bg-white/10 transition-colors text-center border border-white/10">
+                            Try Live Demo
+                        </a>
+                    </div>
 
                     <div class="space-y-6">
                         <div class="flex items-start gap-4 analytics-item opacity-0 translate-x-10">
@@ -541,8 +574,6 @@
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <!--
     <section class="relative py-32 bg-dark overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-b from-primary/10 to-transparent"></div>
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-3xl opacity-30"></div>
@@ -567,7 +598,6 @@
             <p class="mt-8 text-sm text-gray-500 cta-note opacity-0">No credit card required • 14-day free trial • Cancel anytime</p>
         </div>
     </section>
-    -->
 
     <!-- ================= WEBSITE TOUR MODAL ================= -->
     <div id="tour-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-50">
@@ -647,7 +677,7 @@
             </div>
 
             <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-sm text-gray-600">© 2026 SentimentAI. All rights reserved.</p>
+                <p class="text-sm text-gray-600"> 2026 SentimentAI. All rights reserved.</p>
                 <div class="flex gap-6 text-sm text-gray-600">
                     <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
                     <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
@@ -662,7 +692,7 @@
 
 const tourSteps = [
     {
-        title: "Welcome to SentimentAI 👋",
+        title: "Welcome to SentimentAI ",
         text: "This quick tour will show you how to analyze Facebook comments using AI."
     },
     {
@@ -824,24 +854,6 @@ ScrollTrigger.create({
 });
 
 // ==========================
-// Chart Animation
-// ==========================
-ScrollTrigger.create({
-    trigger: "#chart-container",
-    start: "top 80%",
-    onEnter: () => {
-        document.querySelectorAll('.chart-bar').forEach((bar, i) => {
-            gsap.to(bar, {
-                height: bar.dataset.height,
-                duration: 1,
-                delay: i * 0.1,
-                ease: "elastic.out(1,0.5)"
-            });
-        });
-    }
-});
-
-// ==========================
 // CTA Animation
 // ==========================
 ScrollTrigger.create({
@@ -856,7 +868,7 @@ ScrollTrigger.create({
 });
 
 // ==================================================
-// ✅ LIVE SENTIMENT DEMO (UPDATED & CLEAN)
+// LIVE SENTIMENT DEMO (UPDATED & CLEAN)
 // ==================================================
 function analyzeComment() {
     const input = document.getElementById("comment-input");

@@ -214,13 +214,13 @@
                 </h2>
 
                 <div class="space-y-6">
-                    <div class="setting-item flex items-center justify-between p-3 rounded-lg">
-                        <div>
-                            <p class="text-sm font-medium text-white">Two-Factor Authentication</p>
-                            <p class="text-xs text-gray-500">Add extra security to your account</p>
-                        </div>
-                        <button class="px-3 py-1.5 rounded-lg bg-primary/20 text-primary text-sm hover:bg-primary/30 transition-colors">Enable</button>
-                    </div>
+<!--                    <div class="setting-item flex items-center justify-between p-3 rounded-lg">-->
+<!--                        <div>-->
+<!--                            <p class="text-sm font-medium text-white">Two-Factor Authentication</p>-->
+<!--                            <p class="text-xs text-gray-500">Add extra security to your account</p>-->
+<!--                        </div>-->
+<!--                        <button class="px-3 py-1.5 rounded-lg bg-primary/20 text-primary text-sm hover:bg-primary/30 transition-colors">Enable</button>-->
+<!--                    </div>-->
 
                     <div class="border-t border-white/10"></div>
 
@@ -263,7 +263,44 @@
                             <p class="text-sm font-medium text-white">Delete Account</p>
                             <p class="text-xs text-gray-500">Permanently delete your account and all data</p>
                         </div>
-                        <button onclick="deleteAccount()" class="px-4 py-2 rounded-lg bg-red-500/20 text-red-400 text-sm hover:bg-red-500/30 transition-colors">Delete</button>
+                        <button type="button" onclick="openDeleteAccountModal()" class="px-4 py-2 rounded-lg bg-red-500/20 text-red-400 text-sm hover:bg-red-500/30 transition-colors">Delete</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete Account Modal -->
+            <div id="delete-account-modal" class="hidden fixed inset-0 z-50">
+                <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeDeleteAccountModal()"></div>
+                <div class="absolute inset-0 flex items-center justify-center p-4">
+                    <div class="w-full max-w-md glass-card rounded-2xl border border-white/10 shadow-2xl overflow-hidden">
+                        <div class="p-6">
+                            <div class="flex items-start gap-3">
+                                <div class="w-12 h-12 rounded-xl bg-red-500/15 flex items-center justify-center text-red-400">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-semibold text-white">Delete your account?</h3>
+                                    <p class="text-sm text-gray-400 mt-1">This will permanently delete your account and your analysis history. This action cannot be undone.</p>
+                                </div>
+                                <button type="button" class="p-2 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-colors" onclick="closeDeleteAccountModal()" aria-label="Close">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div id="delete-account-modal-message" class="mt-4 text-sm hidden"></div>
+
+                            <label class="block mt-4 text-sm text-gray-400">Type <span class="text-red-300 font-semibold">DELETE</span> to confirm</label>
+                            <input id="delete-account-confirm" type="text" placeholder="DELETE" class="mt-2 w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 transition-colors">
+                        </div>
+
+                        <div class="px-6 py-4 border-t border-white/10 flex items-center justify-end gap-3 bg-white/[0.02]">
+                            <button type="button" class="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-sm text-white transition-colors" onclick="closeDeleteAccountModal()">Cancel</button>
+                            <button id="delete-account-confirm-btn" type="button" class="px-4 py-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 border border-red-500/20 text-sm text-red-300 transition-colors" onclick="confirmDeleteAccount()">Yes, Delete</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -404,13 +441,73 @@
             alert('API key copied to clipboard!');
         }
 
-        function deleteAccount() {
-            if (confirm('Are you sure? This action cannot be undone. All your data will be permanently deleted.')) {
-                if (confirm('Please confirm again. Type "DELETE" to proceed.')) {
-                    alert('Account deletion requested. You will receive a confirmation email.');
+        function openDeleteAccountModal() {
+            const modal = document.getElementById('delete-account-modal');
+            const msg = document.getElementById('delete-account-modal-message');
+            const input = document.getElementById('delete-account-confirm');
+            if (msg) msg.classList.add('hidden');
+            if (input) input.value = '';
+            if (modal) modal.classList.remove('hidden');
+            setTimeout(() => { if (input) input.focus(); }, 0);
+        }
+
+        function closeDeleteAccountModal() {
+            const modal = document.getElementById('delete-account-modal');
+            const msg = document.getElementById('delete-account-modal-message');
+            if (msg) msg.classList.add('hidden');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function _setDeleteModalMessage(message, isSuccess) {
+            const el = document.getElementById('delete-account-modal-message');
+            if (!el) return;
+            el.textContent = message;
+            el.classList.remove('hidden');
+            el.classList.toggle('text-green-400', !!isSuccess);
+            el.classList.toggle('text-red-400', !isSuccess);
+        }
+
+        async function confirmDeleteAccount() {
+            const btn = document.getElementById('delete-account-confirm-btn');
+            const input = document.getElementById('delete-account-confirm');
+            const value = (input?.value || '').trim();
+            if (value !== 'DELETE') {
+                _setDeleteModalMessage('Please type DELETE to confirm.', false);
+                return;
+            }
+
+            const oldText = btn ? btn.textContent : '';
+            if (btn) {
+                btn.disabled = true;
+                btn.classList.add('opacity-70', 'cursor-not-allowed');
+                btn.textContent = 'Deleting...';
+            }
+
+            try {
+                const res = await fetch('/api/delete-account', {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' }
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || !data.success) {
+                    throw new Error(data.message || 'Failed to delete account');
+                }
+                window.location.href = data.redirect || '/login';
+            } catch (e) {
+                _setDeleteModalMessage(e?.message || 'Failed to delete account', false);
+                if (btn) {
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-70', 'cursor-not-allowed');
+                    btn.textContent = oldText;
                 }
             }
         }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key !== 'Escape') return;
+            const modal = document.getElementById('delete-account-modal');
+            if (modal && !modal.classList.contains('hidden')) closeDeleteAccountModal();
+        });
 
         // Close profile menu on outside click
         document.addEventListener('click', function(e) {

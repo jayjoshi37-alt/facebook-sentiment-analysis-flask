@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, redirect, session
+from flask import Flask, request, jsonify, render_template, redirect, session, Response
 from flask_mysqldb import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
@@ -12,6 +12,8 @@ import datetime
 import base64
 import sys
 from datetime import datetime as dt
+import csv
+import io
 
 load_dotenv()
 
@@ -23,6 +25,7 @@ app.config['MYSQL_HOST'] = os.getenv("MYSQL_HOST")
 app.config['MYSQL_USER'] = os.getenv("MYSQL_USER")
 app.config['MYSQL_PASSWORD'] = os.getenv("MYSQL_PASSWORD")
 app.config['MYSQL_DB'] = os.getenv("MYSQL_DB")
+app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 mysql = MySQL(app)
 
@@ -368,6 +371,59 @@ def api_history():
         return jsonify({"success": False, "message": "Server error"}), 500
 
 
+@app.route('/api/history/export')
+def export_history():
+    if not session.get('user_id'):
+        return jsonify({"success": False, "message": "Unauthorized"}), 401
+
+    try:
+        _ensure_analysis_table()
+        user_id = session.get('user_id')
+
+        cur = mysql.connection.cursor()
+        cur.execute(
+            """
+            SELECT id, comment_text, prediction, created_at
+            FROM comment_analyses
+            WHERE user_id = %s
+            ORDER BY created_at DESC
+            """,
+            (user_id,)
+        )
+        rows = cur.fetchall() or []
+        cur.close()
+
+        output = io.StringIO(newline='')
+        writer = csv.writer(output)
+        writer.writerow(["id", "comment_text", "prediction", "created_at"])
+        for r in rows:
+            created_at = r.get('created_at')
+            writer.writerow([
+                r.get('id') or "",
+                r.get('comment_text') or "",
+                r.get('prediction') or "",
+                (created_at.isoformat(sep=' ') if created_at else "")
+            ])
+
+        csv_text = output.getvalue()
+        output.close()
+
+        ts = dt.now().strftime('%Y%m%d_%H%M%S')
+        filename = f"comment_history_{ts}.csv"
+        return Response(
+            csv_text,
+            mimetype='text/csv; charset=utf-8',
+            headers={
+                'Content-Disposition': f'attachment; filename={filename}',
+                'Cache-Control': 'no-store'
+            }
+        )
+
+    except Exception as e:
+        print("HISTORY EXPORT ERROR:", e)
+        return jsonify({"success": False, "message": "Server error"}), 500
+
+
 @app.route('/logout')
 def logout():
     session.clear()
@@ -494,6 +550,33 @@ def change_password():
 
     except Exception as e:
         print("CHANGE PASSWORD ERROR:", e)
+        return jsonify({"success": False, "message": "Server error"}), 500
+
+
+@app.route('/api/delete-account', methods=['POST'])
+def delete_account():
+    if not session.get('user_id'):
+        return jsonify({"success": False, "message": "Unauthorized"}), 401
+
+    try:
+        user_id = session.get('user_id')
+
+        _ensure_analysis_table()
+        cur = mysql.connection.cursor()
+        cur.execute("DELETE FROM comment_analyses WHERE user_id = %s", (user_id,))
+        cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
+        mysql.connection.commit()
+        cur.close()
+
+        session.clear()
+        return jsonify({"success": True, "redirect": "/login"})
+
+    except Exception as e:
+        try:
+            mysql.connection.rollback()
+        except Exception:
+            pass
+        print("DELETE ACCOUNT ERROR:", e)
         return jsonify({"success": False, "message": "Server error"}), 500
 
 
