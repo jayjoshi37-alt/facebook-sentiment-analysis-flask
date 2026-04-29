@@ -138,15 +138,18 @@ HATE_EMOJI_KEYWORDS = [
 ]
 
 def predict_hate(comment):
-
-    # ✅ ADD THIS
-    if model is None or tfidf is None:
-        return "MODEL_ERROR", 0.0
-
     processed = clean_text(comment)
 
     if processed.strip() == "":
         return "NON-HATE", 0.0
+
+    # Emoji rule check
+    emoji_hit = False
+    for word in HATE_EMOJI_KEYWORDS:
+        if word in processed:
+            emoji_hit = True
+            break
+
     # ML prediction
     vec = tfidf.transform([processed])
     pred = model.predict(vec)[0]
@@ -596,5 +599,6 @@ def contact():
 
 
 # ================= RUN =================
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(debug=True)
